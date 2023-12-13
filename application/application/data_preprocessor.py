@@ -45,16 +45,18 @@ class DataPreprocessor(ttk.Frame):
     def update_preprocessed(self):
         preprocessed = []
         not_preprocessed = []
-        for filename in os.listdir(self.data_loader.get_loaded_data_dir()):
-            number = self.data_loader.get_loaded_data_number_by_filename(filename)
-            if number:
-                not_preprocessed.append(number)
+        if os.path.exists(self.data_loader.get_loaded_data_dir()):
+            for filename in os.listdir(self.data_loader.get_loaded_data_dir()):
+                number = self.data_loader.get_loaded_data_number_by_filename(filename)
+                if number:
+                    not_preprocessed.append(number)
 
-        for filename in os.listdir(self.module.get_preprocessed_data_dir()):
-            number = self.module.get_preprocessed_data_number_by_filename(filename)
-            if number in not_preprocessed:
-                not_preprocessed.remove(number)
-                preprocessed.append(number)
+        if os.path.exists(self.module.get_preprocessed_data_dir()):
+            for filename in os.listdir(self.module.get_preprocessed_data_dir()):
+                number = self.module.get_preprocessed_data_number_by_filename(filename)
+                if number in not_preprocessed:
+                    not_preprocessed.remove(number)
+                    preprocessed.append(number)
 
         self.list_preprocessed.delete(0, self.list_preprocessed.size() - 1)
         for p in preprocessed:

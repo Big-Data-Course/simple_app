@@ -6,6 +6,8 @@ import os
 import re
 
 def analyze(numbers, input_dir, name, out1, title1, xlabel1, ylabel1, out2, title2, xlabel2, ylabel2):
+    if not os.path.exists(input_dir):
+        return
     parts = []
     for num in numbers:
         fin = os.path.join(input_dir, "gaia_data_dr3_task4_preprocessed_" + num)
@@ -69,10 +71,6 @@ class Task4(AbstractModule):
         self.figure4 = os.path.join(self.results, "distribution_by_bp_mag_log_count.png")
         self.figure5 = os.path.join(self.results, "distribution_by_rp_mag.png")
         self.figure6 = os.path.join(self.results, "distribution_by_rp_mag_log_count.png")
-        if not os.path.exists( self.preprocessed_data_dir):
-            os.makedirs( self.preprocessed_data_dir)
-        if not os.path.exists(self.results):
-            os.makedirs(self.results)
 
 
     def get_name(self):
@@ -90,6 +88,8 @@ class Task4(AbstractModule):
 
 
     def preprocess_data(self, path, number):
+        if not os.path.exists( self.preprocessed_data_dir):
+            os.makedirs( self.preprocessed_data_dir)
         df = pd.read_csv(path, sep=' ', header = 0)
         df[['phot_g_mean_mag', 'phot_rp_mean_mag', 'phot_bp_mean_mag']].to_csv(os.path.join(self.preprocessed_data_dir, "gaia_data_dr3_task4_preprocessed_" + number), index=False, sep = " ")
 
@@ -104,6 +104,8 @@ class Task4(AbstractModule):
 
 
     def analyze_data(self, numbers):
+        if not os.path.exists(self.results):
+            os.makedirs(self.results)
         process = Process(target=analyze_all, args=(numbers, self.preprocessed_data_dir, self.figure1,
                                                     self.figure2, self.figure3, self.figure4, self.figure5,
                                                     self.figure6))

@@ -11,6 +11,8 @@ import os
 import re
 
 def analyze(numbers, input_dir, out1, out2):
+    if not os.path.exists(input_dir):
+        return
     parts = []
     for num in numbers:
         fin = os.path.join(input_dir, "gaia_data_dr3_task6_preprocessed_" + num)
@@ -65,13 +67,14 @@ class Task6(AbstractModule):
 
 
     def get_gaia_source_restrictions(self):
-        return ["parallax_over_error > 1",
+        return ["parallax_over_error > 10",
                 "phot_g_mean_flux_over_error > 50",
                 "phot_rp_mean_flux_over_error > 20",
                 "phot_bp_mean_flux_over_error > 20",
                 "phot_bp_rp_excess_factor < 1.3+0.06*power(phot_bp_mean_mag-phot_rp_mean_mag,2)",
                 "phot_bp_rp_excess_factor > 1.0+0.015*power(phot_bp_mean_mag-phot_rp_mean_mag,2)",
-                "visibility_periods_used > 8", "astrometric_chi2_al/(astrometric_n_good_obs_al-5) < 1.44*greatest(1,exp(-0.4*(phot_g_mean_mag-19.5)))"]
+                "visibility_periods_used > 8",
+                "astrometric_chi2_al/(astrometric_n_good_obs_al-5) < 1.44*greatest(1,exp(-0.4*(phot_g_mean_mag-19.5)))"]
     
 
     def set_working_directory(self, dir):
@@ -79,11 +82,7 @@ class Task6(AbstractModule):
         self.preprocessed_data_dir = os.path.join(dir, "task6_preprocessed_data")
         self.results = os.path.join(dir, "task6_results")
         self.figure1 = os.path.join(self.results, "HR_diagram.png")
-        self.figure2 = os.path.join(self.results, "HR_diagram_filtered.png")
-        if not os.path.exists( self.preprocessed_data_dir):
-            os.makedirs( self.preprocessed_data_dir)
-        if not os.path.exists(self.results):
-            os.makedirs(self.results)
+        self.figure2 = os.path.join(self.results, "HR_diagram_filtered.png")        
 
 
     def get_name(self):
@@ -101,6 +100,8 @@ class Task6(AbstractModule):
 
 
     def preprocess_data(self, path, number):
+        if not os.path.exists( self.preprocessed_data_dir):
+            os.makedirs( self.preprocessed_data_dir)
         df = pd.read_csv(path, sep=' ', header = 0)
         df['dist'] = df['parallax'].apply(lambda x: 1000.0 / x)
         g_mag = df['phot_g_mean_mag'].to_numpy()
@@ -115,6 +116,8 @@ class Task6(AbstractModule):
 
 
     def analyze_data(self, numbers):
+        if not os.path.exists(self.results):
+            os.makedirs(self.results)
         process = Process(target=analyze, args=(numbers, self.preprocessed_data_dir, self.figure1, self.figure2))
         process.start()
         process.join()

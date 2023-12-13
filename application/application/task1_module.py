@@ -15,6 +15,8 @@ import os
 import re
 
 def analyze(numbers, input_dir, out1, out2, out3):
+    if not os.path.exists(input_dir):
+        return
     parts = []
     for num in numbers:
         fin = os.path.join(input_dir, "gaia_data_dr3_task1_preprocessed_" + num)
@@ -98,10 +100,6 @@ class Task1(AbstractModule):
         self.figure1 = os.path.join(self.results, "location.png")
         self.figure2 = os.path.join(self.results, "location_projection.png")
         self.figure3 = os.path.join(self.results, "location_galactic_coords_projection.png")
-        if not os.path.exists( self.preprocessed_data_dir):
-            os.makedirs( self.preprocessed_data_dir)
-        if not os.path.exists(self.results):
-            os.makedirs(self.results)
 
 
     def get_name(self):
@@ -119,6 +117,8 @@ class Task1(AbstractModule):
 
 
     def preprocess_data(self, path, number):
+        if not os.path.exists( self.preprocessed_data_dir):
+            os.makedirs( self.preprocessed_data_dir)
         df = pd.read_csv(path, sep=' ', header = 0)
         radian = np.pi / 180
         df['ra_rad'] = df['ra'].apply(lambda x: (x if x <= 180 else x - 360) * radian)
@@ -149,6 +149,8 @@ class Task1(AbstractModule):
 
 
     def analyze_data(self, numbers):
+        if not os.path.exists(self.results):
+            os.makedirs(self.results)
         process = Process(target=analyze, args=(numbers, self.preprocessed_data_dir, self.figure1,
                                                 self.figure2, self.figure3))
         process.start()

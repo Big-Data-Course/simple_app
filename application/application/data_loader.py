@@ -46,8 +46,6 @@ class DataLoader(ttk.Frame):
 
     def set_working_directory(self, dir):
         self.working_dir = os.path.join(dir, "loaded_data")
-        if not os.path.exists(self.working_dir):
-            os.makedirs(self.working_dir)
         self.update_loaded()
 
 
@@ -68,13 +66,14 @@ class DataLoader(ttk.Frame):
     def update_loaded(self):
         loaded = []
         not_loaded = [("0" + str(i)) if i < 10 else str(i) for i in range(self.data_parts_num)]
-        for filename in os.listdir(self.working_dir):
-            if re.fullmatch(r'gaia_data_dr3_\d{2}', filename) == None:
-                continue
-            number = filename.split("_")[-1]
-            if number in not_loaded:
-                not_loaded.remove(number)
-                loaded.append(number)
+        if os.path.exists(self.working_dir):
+            for filename in os.listdir(self.working_dir):
+                if re.fullmatch(r'gaia_data_dr3_\d{2}', filename) == None:
+                    continue
+                number = filename.split("_")[-1]
+                if number in not_loaded:
+                    not_loaded.remove(number)
+                    loaded.append(number)
 
         self.list_loaded.delete(0, self.list_loaded.size() - 1)
         for l in loaded:
@@ -91,6 +90,8 @@ class DataLoader(ttk.Frame):
         selected = self.list_not_loaded.curselection()
         parts = [int(self.list_not_loaded.get(i)) for i in selected]
         if len(selected) > 0:
+            if not os.path.exists(self.working_dir):
+                os.makedirs(self.working_dir)
             self.load_button["state"] = "disabled"
             self.load_button.update()
             if len(selected) == 1:

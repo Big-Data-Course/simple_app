@@ -42,10 +42,11 @@ class DataAnalyzer(ttk.Frame):
 
     def update_avaliable(self):
         avaliable = []
-        for filename in os.listdir(self.module.get_preprocessed_data_dir()):
-            number = self.module.get_preprocessed_data_number_by_filename(filename)
-            if number:
-                avaliable.append(number)
+        if os.path.exists(self.module.get_preprocessed_data_dir()):
+            for filename in os.listdir(self.module.get_preprocessed_data_dir()):
+                number = self.module.get_preprocessed_data_number_by_filename(filename)
+                if number:
+                    avaliable.append(number)
 
         self.list_avaliable.delete(0, self.list_avaliable.size() - 1)
         for p in avaliable:

@@ -10,6 +10,8 @@ import os
 import re
 
 def analyze(numbers, input_dir, out):
+    if not os.path.exists(input_dir):
+        return
     parts = []
     for num in numbers:
         fin = os.path.join(input_dir, "gaia_data_dr3_task2_preprocessed_" + num)
@@ -61,10 +63,6 @@ class Task2(AbstractModule):
         self.preprocessed_data_dir = os.path.join(dir, "task2_preprocessed_data")
         self.results = os.path.join(dir, "task2_results")
         self.figure = os.path.join(self.results, "variation_of_proper_motion.png")
-        if not os.path.exists( self.preprocessed_data_dir):
-            os.makedirs( self.preprocessed_data_dir)
-        if not os.path.exists(self.results):
-            os.makedirs(self.results)
 
 
     def get_name(self):
@@ -82,6 +80,8 @@ class Task2(AbstractModule):
 
 
     def preprocess_data(self, path, number):
+        if not os.path.exists( self.preprocessed_data_dir):
+            os.makedirs( self.preprocessed_data_dir)
         df = pd.read_csv(path, sep=' ', header = 0)
         df[['pmra', 'pmdec']].to_csv(os.path.join(self.preprocessed_data_dir, "gaia_data_dr3_task2_preprocessed_" + number), index=False, sep = " ")
     
@@ -91,6 +91,8 @@ class Task2(AbstractModule):
 
 
     def analyze_data(self, numbers):
+        if not os.path.exists(self.results):
+            os.makedirs(self.results)
         process = Process(target=analyze, args=(numbers, self.preprocessed_data_dir, self.figure))
         process.start()
         process.join()
